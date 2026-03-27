@@ -15,6 +15,10 @@ pnpm install
 cargo leptos watch
 ```
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=rust-ui/ui&type=Date)](https://star-history.com/#rust-ui/ui&Date)
+
 ## License
 
 MIT — [Max Wells](https://www.rust-ui.com)
