@@ -63,7 +63,7 @@ pub fn Login04() -> impl IntoView {
                                         </div>
                                         <Input attr:r#type="password" attr:id="password" attr:required=true />
                                     </div>
-                                    <Button variant=ButtonVariant::Default class="w-full" attr:r#type="submit">
+                                    <Button class="w-full" attr:r#type="submit">
                                         Login
                                     </Button>
                                     <div class="relative text-sm text-center after:border-border after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
