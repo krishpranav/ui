@@ -31,7 +31,6 @@ ENV RUSTC_WRAPPER=""
 
 # Path dependencies must exist before cargo chef cook can resolve them
 COPY crates/tw_merge crates/tw_merge
-COPY crates/tw_merge_variants crates/tw_merge_variants
 COPY crates/_markdown_crate crates/_markdown_crate
 
 RUN cargo chef cook --release --target x86_64-unknown-linux-musl --recipe-path recipe.json
