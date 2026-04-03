@@ -24,7 +24,17 @@ pub fn DemoUseHistory() -> impl IntoView {
 fn DemoUseHistoryInner() -> impl IntoView {
     let history = use_history();
 
-    let active = RwSignal::new("slate");
+    let current_url = history.current();
+    let active = Signal::derive(move || {
+        current_url
+            .get()
+            .trim_start_matches('?')
+            .split('&')
+            .find(|p| p.starts_with("color="))
+            .and_then(|p| p.strip_prefix("color="))
+            .unwrap_or("slate")
+            .to_string()
+    });
 
     let can_back = history.can_go_back();
     let can_forward = history.can_go_forward();
@@ -54,8 +64,9 @@ fn DemoUseHistoryInner() -> impl IntoView {
                                         },
                                     )
                                 }
+                                data-color=name
+                                data-active=move || (active.get() == name).to_string()
                                 on:click=move |_| {
-                                    active.set(name);
                                     history.push(format!("?color={name}"));
                                 }
                             />

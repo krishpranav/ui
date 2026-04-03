@@ -42,16 +42,16 @@ impl UseHistory {
 
         provide_context(hook);
 
-        // Seed the stack with the current URL
+        // Seed the stack with the current query string (same format as push())
         Effect::new(move |_| {
-            let href = window().location().href().unwrap_or_default();
-            hook.history.update(|h| h.push(href));
+            let search = window().location().search().unwrap_or_default();
+            hook.history.update(|h| h.push(search));
         });
 
         // Register ⌘Z / ⌘⇧Z / ⌃Y shortcuts
         Effect::new(move |_| {
             let closure = Closure::<dyn Fn(KeyboardEvent)>::new(move |e: KeyboardEvent| {
-                let key = e.key();
+                let key = e.key().to_lowercase();
                 let meta = e.meta_key() || e.ctrl_key();
                 let shift = e.shift_key();
 
@@ -158,6 +158,13 @@ impl UseHistory {
     pub fn total(&self) -> Signal<usize> {
         let history = self.history;
         Signal::derive(move || history.with(|h| h.len()))
+    }
+
+    /// The current URL in the history stack (reactive).
+    pub fn current(&self) -> Signal<String> {
+        let history = self.history;
+        let index = self.index;
+        Signal::derive(move || history.with(|h| h.get(index.get()).cloned().unwrap_or_default()))
     }
 
     /* ========================================================== */
