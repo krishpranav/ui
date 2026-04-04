@@ -102,8 +102,13 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                     "#app-loading-screen svg line:nth-child(8){animation-delay:-0.125s}"
                     "@keyframes ios-spin{0%,39%,100%{opacity:0.2}40%{opacity:1}}"
                     "#app-loading-screen.fade-out{clip-path:ellipse(150% 0% at 50% 0%)}"
+                    // opacity-only (no transform): transform creates a containing block for
+                    // position:fixed children (Drawer, ContextMenu, Sonner), breaking their layout.
+                    // fill-mode:backwards (not both/forwards): keeps stacking context clean after
+                    // animation ends — fill-mode:both would permanently apply animation styles,
+                    // which also triggers a stacking context even at opacity:1.
                     "@keyframes page__fade_in{from{opacity:0}to{opacity:1}}"
-                    ".page__fade{animation:page__fade_in 200ms ease-out both}"
+                    ".page__fade{animation:page__fade_in 200ms ease-out backwards}"
                 </style>
                 <script>
                     "(function(){if(window.location.pathname!=='/') return;document.documentElement.classList.add('loading-screen');var l=document.createElement('div');l.id='app-loading-screen';l.innerHTML='<img src=\"/icons/logo-dark-square-88.png\" alt=\"\" width=\"88\" height=\"88\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"6\"/><line x1=\"16.24\" y1=\"7.76\" x2=\"19.07\" y2=\"4.93\"/><line x1=\"18\" y1=\"12\" x2=\"22\" y2=\"12\"/><line x1=\"16.24\" y1=\"16.24\" x2=\"19.07\" y2=\"19.07\"/><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"22\"/><line x1=\"4.93\" y1=\"19.07\" x2=\"7.76\" y2=\"16.24\"/><line x1=\"2\" y1=\"12\" x2=\"6\" y2=\"12\"/><line x1=\"4.93\" y1=\"4.93\" x2=\"7.76\" y2=\"7.76\"/></svg>';document.documentElement.appendChild(l);document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){document.documentElement.classList.remove('loading-screen');l.classList.add('fade-out');setTimeout(function(){l.remove()},1000)},1000)})})()"
