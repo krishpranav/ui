@@ -7,8 +7,8 @@ name: Issue Triage (AI)
 # Tested and working — only blocked by credit balance.
 
 on:
-  issues:
-    types: [opened]
+  # issues:
+  #   types: [opened]
   workflow_dispatch:
     inputs:
       issue_number:
