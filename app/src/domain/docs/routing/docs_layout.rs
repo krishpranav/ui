@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
 use app_domain::utils::{PARAM, ParamsUtils};
+
+use crate::utils::page_transition::{PAGE_OUTLET, retrigger_page_fade};
 use app_routes::{ComponentsRoutes, HooksRoutes};
 use leptos::prelude::*;
 use leptos_router::components::Outlet;
@@ -38,6 +40,13 @@ pub fn DocsLayout() -> impl IntoView {
         }
     });
 
+    Effect::new(move |prev: Option<()>| {
+        let _ = location.pathname.get();
+        if prev.is_some() {
+            retrigger_page_fade();
+        }
+    });
+
     view! {
         <HeaderDocs />
 
@@ -52,8 +61,10 @@ pub fn DocsLayout() -> impl IntoView {
                             all_arc_demos=all_arc_demos
                         />
                     }
-                }} // TOC Sidenav (right side)
-                <Outlet />
+                }}
+                <div id=PAGE_OUTLET class="page__fade min-w-0 flex-1">
+                    <Outlet />
+                </div>
                 {move || {
                     view! { <TableOfContents toc_items=toc_context.toc_items.get() /> }
                 }}
