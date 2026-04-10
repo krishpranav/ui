@@ -50,16 +50,24 @@ pub fn check_nightly_setup(dir: &Path) -> NightlyStatus {
 /* ========================================================== */
 
 /// Returns true if `rust-toolchain.toml` or `rust-toolchain` in `dir` specifies nightly.
+/// Accepts both `"nightly"` and dated variants like `"nightly-2024-01-01"`.
 fn has_nightly_toolchain(dir: &Path) -> bool {
     // Modern format: rust-toolchain.toml with [toolchain] channel = "nightly"
     if let Ok(content) = fs::read_to_string(dir.join("rust-toolchain.toml")) {
-        return parse_toolchain_toml_channel(&content).as_deref() == Some("nightly");
+        return parse_toolchain_toml_channel(&content).as_deref().is_some_and(is_nightly_channel);
     }
     // Legacy format: rust-toolchain file with plain "nightly" text
     if let Ok(content) = fs::read_to_string(dir.join("rust-toolchain")) {
-        return content.lines().find(|l| !l.trim().is_empty()).map(|l| l.trim()) == Some("nightly");
+        return content
+            .lines()
+            .find(|l| !l.trim().is_empty())
+            .is_some_and(|l| is_nightly_channel(l.trim()));
     }
     false
+}
+
+fn is_nightly_channel(channel: &str) -> bool {
+    channel == "nightly" || channel.starts_with("nightly-")
 }
 
 /// Returns true if `Cargo.toml` in `dir` has `leptos` with `"nightly"` in features.
@@ -269,6 +277,52 @@ mod tests {
         let status = NightlyStatus { toolchain_nightly: false, leptos_nightly_feature: false };
         assert!(!status.is_ok());
         assert_eq!(status.missing_items().len(), 2);
+    }
+
+    #[test]
+    fn dated_nightly_toolchain_toml_is_detected() {
+        let dir = TempDir::new().unwrap();
+        write(&dir, "rust-toolchain.toml", "[toolchain]\nchannel = \"nightly-2024-01-01\"\n");
+        assert!(has_nightly_toolchain(dir.path()));
+    }
+
+    #[test]
+    fn dated_nightly_legacy_toolchain_is_detected() {
+        let dir = TempDir::new().unwrap();
+        write(&dir, "rust-toolchain", "nightly-2024-01-01");
+        assert!(has_nightly_toolchain(dir.path()));
+    }
+
+    #[test]
+    fn toolchain_toml_missing_channel_key_returns_false() {
+        let dir = TempDir::new().unwrap();
+        write(&dir, "rust-toolchain.toml", "[toolchain]\ntargets = [\"wasm32-unknown-unknown\"]\n");
+        assert!(!has_nightly_toolchain(dir.path()));
+    }
+
+    #[test]
+    fn malformed_toolchain_toml_returns_false() {
+        let dir = TempDir::new().unwrap();
+        write(&dir, "rust-toolchain.toml", "not valid toml ][[[");
+        assert!(!has_nightly_toolchain(dir.path()));
+    }
+
+    #[test]
+    fn leptos_simple_string_dep_returns_false() {
+        let dir = TempDir::new().unwrap();
+        write(
+            &dir,
+            "Cargo.toml",
+            "[package]\nname = \"test\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[dependencies]\nleptos = \"0.8\"\n",
+        );
+        assert!(!has_leptos_nightly_feature(dir.path()));
+    }
+
+    #[test]
+    fn malformed_cargo_toml_returns_false() {
+        let dir = TempDir::new().unwrap();
+        write(&dir, "Cargo.toml", "not valid toml ][[[");
+        assert!(!has_leptos_nightly_feature(dir.path()));
     }
 
     #[test]
