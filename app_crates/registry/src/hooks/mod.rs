@@ -1,4 +1,4 @@
-pub mod scroll_lock;
+pub mod use_scroll_lock;
 pub mod use_breadcrumb;
 pub mod use_can_scroll;
 pub mod use_can_scroll_vertical;

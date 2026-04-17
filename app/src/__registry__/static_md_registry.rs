@@ -2979,7 +2979,7 @@ pub fn get_static_registry_entry(markdown_type: MarkdownType) -> Option<&'static
             install_name: "scroll_area",
         }),
         MarkdownType::StaticInstallScrollLock => Some(&StaticRegistryEntry {
-            raw_code: include_str!("../../../app_crates/registry/src/hooks/scroll_lock.rs"),
+            raw_code: include_str!("../../../app_crates/registry/src/hooks/use_scroll_lock.rs"),
             demo_name: "demo_scroll_lock",
             file_path: "hooks/scroll_lock.md",
             install_name: "scroll_lock",
