@@ -2,7 +2,7 @@ use leptos::prelude::*;
 
 use crate::common::icon_registry_getter::{get_animated_icon_elements, get_icon_css};
 use crate::common::icon_type::IconTypeAnimated;
-use crate::svg_icon::SvgIcon;
+use crate::leptos::svg_icon::SvgIcon;
 
 /// Leptos component for rendering animated SVG icons. Zero-allocation O(1) lookup.
 #[component]

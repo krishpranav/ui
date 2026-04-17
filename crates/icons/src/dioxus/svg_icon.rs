@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use tw_merge::*;
 
 #[component]
 pub fn SvgIcon(

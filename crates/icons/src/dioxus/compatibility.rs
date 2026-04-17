@@ -11454,9 +11454,8 @@ mod tests {
 
     #[test]
     fn test_compatibility_functions_compile() {
-        // Test that compatibility functions can be created without panicking
-        let _activity = Activity { class: None };
-        let _check = Check { class: Some("text-red-500".to_string()) };
-        let _x = X { class: None };
+        let _activity = ActivityProps { class: None };
+        let _check = CheckProps { class: Some("text-red-500".to_string()) };
+        let _x = XProps { class: None };
     }
 }
