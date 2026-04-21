@@ -25,7 +25,7 @@ pub fn ChartsLayout() -> impl IntoView {
         <Title text=title />
         // Load ApexCharts only on chart pages for performance optimization
         <script id="apexcharts-cdn" defer src="/cdn/apexcharts.5.3.6.min.js"></script>
-        <script id="chart-init-script" defer src="/app_components/chart_init.js"></script>
+        <script id="chart-init-script" defer src="/app_components/chart_init.js?v=2"></script>
 
         <HeaderDocs />
 

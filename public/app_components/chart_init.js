@@ -319,6 +319,17 @@ function resolveColor(cssValue) {
   document.documentElement.appendChild(el);
   const resolved = getComputedStyle(el).color;
   el.remove();
+  // If browser returns lab()/oklch() instead of rgb(), ApexCharts can't parse it.
+  // Use canvas to force-convert to sRGB.
+  if (resolved && !resolved.startsWith("rgb")) {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = resolved;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return `rgb(${r}, ${g}, ${b})`;
+  }
   return resolved || cssValue;
 }
 
@@ -481,7 +492,7 @@ function buildAreaChartOptions(data, labels, colors, container, theme) {
   const seriesNames = seriesNamesAttr ? JSON.parse(seriesNamesAttr) : null;
   const curveType = container.dataset.chartCurve?.toLowerCase() || "smooth";
   const stackType = container.dataset.chartStackType || "normal";
-  const gradientEnabled = container.dataset.chartGradient === "true";
+  const gradientEnabled = container.dataset.chartGradient !== "false";
   const showYAxis = container.dataset.chartShowYaxis !== "false";
   const showGrid = container.dataset.chartShowGrid === "true";
   const valuePrefix = container.dataset.chartValuePrefix || "";
@@ -499,7 +510,7 @@ function buildAreaChartOptions(data, labels, colors, container, theme) {
     colors: isMultiDataset ? [chart1Color, chart2Color, chart3Color] : [colors.chartPrimary],
     dataLabels: { enabled: false },
     stroke: { curve: curveType, width: 2 },
-    fill: gradientEnabled ? { type: "gradient", gradient: { shadeIntensity: 0.1, opacityFrom: 0.5, opacityTo: 0.2, stops: [0, 90, 100] } } : { type: "solid", opacity: 0.4 },
+    fill: gradientEnabled ? { type: "gradient", gradient: { shadeIntensity: 0, opacityFrom: 0.8, opacityTo: 0.05, stops: [0, 90, 100] } } : { type: "solid", opacity: 0.4 },
     legend: { show: seriesNames !== null, position: "bottom", horizontalAlign: "center", fontSize: "12px", fontFamily: "inherit", fontWeight: 500, offsetY: 5, markers: { width: 8, height: 8, radius: 2 }, itemMargin: { horizontal: 12, vertical: 0 }, labels: { colors: colors.foregroundColor } },
     xaxis: {
       categories: labels,
